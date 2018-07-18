@@ -1,6 +1,28 @@
 #pragma once
 
+
 namespace my {
+
+template <class T, class Allocator>
+class vector;
+
+template <class T, class Allocator>
+bool operator==(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+
+template <class T, class Allocator>
+bool operator<(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+
+template <class T, class Allocator>
+bool operator!=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+
+template <class T, class Allocator>
+bool operator> (const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+
+template <class T, class Allocator>
+bool operator>=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+
+template <class T, class Allocator>
+bool operator<=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
 
 
 template <class T, class Allocator = std::allocator<T>>
@@ -32,7 +54,7 @@ public:
     vector(const vector& other);
     vector(const vector&, const Allocator& alloc);
 
-    vector(vector&& other) noexcept; //почему не указываем аргументы шаблона в определении (<T, Allocator>) //+докопаться до реализации
+    vector(vector&& other) noexcept; //почему можно не указывать аргументы шаблона (ну и например имена переменных) в определении (<T, Allocator>) //+докопаться до реализации
     vector(vector&& other, const Allocator& alloc);
 
     vector(std::initializer_list<T> init, const Allocator& alloc = Allocator());
@@ -136,15 +158,15 @@ public:
                                           || std::allocator_traits<Allocator>::
                                           is_always_equal::value);
 
-    
-    friend bool operator==(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
-    friend bool operator!=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+    friend bool operator== <> (const vector& lhs, const vector& rhs);
+    friend bool operator!= <> (const vector& lhs, const vector& rhs);
 
-    friend bool operator<(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
-    friend bool operator<=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+    friend bool operator<  <> (const vector& lhs, const vector& rhs);
+    friend bool operator<= <> (const vector& lhs, const vector& rhs);
 
-    friend bool operator>(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
-    friend bool operator>=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+    friend bool operator>  <> (const vector& lhs, const vector& rhs);
+    friend bool operator>= <> (const vector& lhs, const vector& rhs);
+
 
 private:
     static constexpr double CAPACITY_INCREASE_FACTOR = 2;
@@ -201,7 +223,7 @@ vector<T, Allocator>::vector(InputIt first, InputIt last, const Allocator& alloc
           capacity_(size_)
 {
     for (size_type i = 0; first != last; i++, first++) {
-        std::allocator_traits<Allocator>::construct(allocator_, data_ + i, first);
+        std::allocator_traits<Allocator>::construct(allocator_, data_ + i, *first);
     }
 }
 
