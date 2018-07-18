@@ -7,18 +7,18 @@ template <class T, class Allocator = std::allocator<T>>
 class vector {
 public:
 
-    typedef T                                                   value_type;
-    typedef Allocator                                           allocator_type;
-    typedef std::size_t                                         size_type;
-    typedef std::ptrdiff_t                                      difference_type;
-    typedef value_type&                                         reference;
-    typedef const value_type&                                   const_reference;
-    typedef std::allocator_traits<Allocator>::pointer           pointer;
-    typedef std::allocator_traits<Allocator>::const_pointer     const_pointer;
-    typedef pointer                                             iterator;
-    typedef const_pointer                                       const_iterator;
-    typedef std::reverse_iterator<iterator>                     reverse_iterator;
-    typedef std::reverse_iterator<const_iterator>               const_reverse_iterator;
+    typedef T                                                        value_type;
+    typedef Allocator                                                allocator_type;
+    typedef std::size_t                                              size_type;
+    typedef std::ptrdiff_t                                           difference_type;
+    typedef value_type&                                              reference;
+    typedef const value_type&                                        const_reference;
+    typedef typename std::allocator_traits<Allocator>::pointer       pointer;
+    typedef typename std::allocator_traits<Allocator>::const_pointer const_pointer;
+    typedef pointer                                                  iterator;
+    typedef const_pointer                                            const_iterator;
+    typedef std::reverse_iterator<iterator>                          reverse_iterator;
+    typedef std::reverse_iterator<const_iterator>                    const_reverse_iterator;
 
 
     explicit vector(const Allocator& alloc = Allocator()) noexcept;
@@ -41,7 +41,10 @@ public:
 
 
     vector&              operator=(const vector& other);
-    vector<T,Allocator>& operator=(vector<T,Allocator>&& other) noexcept;
+    vector<T,Allocator>& operator=(vector<T,Allocator>&& other) noexcept(std::allocator_traits<Allocator>
+                                                                         ::propagate_on_container_move_assignment::value
+                                                                         || std::allocator_traits<Allocator>
+                                                                         ::is_always_equal::value);
     vector&              operator=(std::initializer_list<T> ilist);
 
     void assign(size_type count, const T& value);
@@ -116,30 +119,22 @@ public:
 
     void     resize(size_type count);
     void     resize(size_type count, const value_type& value);
-    void     swap(vector& other) noexcept;
+    void     swap(vector& other) noexcept(std::allocator_traits<Allocator>::
+                                          propagate_on_container_swap::value
+                                          || std::allocator_traits<Allocator>::
+                                          is_always_equal::value);
     void     clear() noexcept;
     ///sort
 
-    template <class T, class Alloc>
-    friend bool operator==(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
-
-    template <class T, class Alloc>
-    friend bool operator<(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
-
-    template <class T, class Alloc>
-    friend bool operator!=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
-
-    template <class T, class Alloc>
-    friend bool operator> (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
-
-    template <class T, class Alloc>
-    friend bool operator>=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
-
-    template <class T, class Alloc>
-    friend bool operator<=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
+    friend bool operator==(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+    friend bool operator<(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+    friend bool operator!=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+    friend bool operator> (const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+    friend bool operator>=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+    friend bool operator<=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
 
 private:
-    static const double CAPACITY_INCREASE_FACTOR = 2;
+    static constexpr double CAPACITY_INCREASE_FACTOR = 2;
 
     void allocate_more_if_needed(size_type count = 1);
     void shift_right_from_pos(const_iterator pos, size_type count = 1);
@@ -249,7 +244,7 @@ vector<T, Allocator>::vector(vector<T, Allocator>&& other, const Allocator& allo
 template<class T, class Allocator>
 vector<T, Allocator>::vector(std::initializer_list<T> init, const Allocator& alloc)
         : allocator_(alloc),
-          data_(allocator_.allocate(allocator_, init.size())),
+          data_(allocator_.allocate(init.size())),
           size_(init.size()),
           capacity_(size_)
 {
@@ -611,7 +606,7 @@ void vector<T, Allocator>::shrink_to_fit()
 
 template<class T, class Allocator>
 template<class... Args>
-reference vector<T, Allocator>::emplace_back(Args&& ...args)
+typename vector<T,Allocator>::reference vector<T, Allocator>::emplace_back(Args&& ...args)
 {
     allocate_more_if_needed();
     std::allocator_traits<Allocator>::construct(allocator_, data_ + size_, std::forward<Args&&>(args)...);
@@ -830,8 +825,8 @@ void vector<T, Allocator>::shift_left_to_pos(const_iterator pos, size_type count
 }
 
 
-template<class T, class Alloc>
-bool operator==(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+template<class T, class Allocator>
+bool operator==(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs)
 {
     if (lhs.size_ != rhs.size_) {
         return false;
@@ -849,12 +844,12 @@ bool operator==(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
     return true;
 }
 
-template<class T, class Alloc>
-bool operator<(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+template<class T, class Allocator>
+bool operator<(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs)
 {
     auto count = std::min(lhs.size(), rhs.size());
 
-    for (typename vector<T, Alloc>::size_type i = 0; i < count; i++) {
+    for (typename vector<T, Allocator>::size_type i = 0; i < count; i++) {
         if (lhs[i] < rhs[i]) {
             return true;
         } else if (lhs[i] > rhs[i]) {
@@ -864,26 +859,26 @@ bool operator<(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
     return lhs.size() < rhs.size();
 }
 
-template<class T, class Alloc>
-bool operator!=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+template<class T, class Allocator>
+bool operator!=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs)
 {
     return !(lhs == rhs);
 }
 
-template<class T, class Alloc>
-bool operator>(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+template<class T, class Allocator>
+bool operator>(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs)
 {
     return rhs < lhs;
 }
 
-template<class T, class Alloc>
-bool operator<=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+template<class T, class Allocator>
+bool operator<=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs)
 {
     return lhs < rhs || lhs == rhs;
 }
 
-template<class T, class Alloc>
-bool operator>=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
+template<class T, class Allocator>
+bool operator>=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs)
 {
     return rhs <= lhs;
 }
