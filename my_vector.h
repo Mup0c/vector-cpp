@@ -93,17 +93,10 @@ public:
     void      reserve(size_type new_cap);
     size_type capacity() const noexcept;
     void      shrink_to_fit();
-///sort:
-    template <class... Args>
-    reference emplace_back(Args&& ...args);
 
-    void push_back(const T& value);
-    void push_back(T&& value);
 
-    void pop_back();
+    void clear() noexcept;
 
-    template <class... Args>
-    iterator emplace(const_iterator pos, Args&&... args);
 
     iterator insert(const_iterator pos, const T& value);
     iterator insert(const_iterator pos, T&& value);
@@ -114,24 +107,44 @@ public:
 
     iterator insert(const_iterator pos, std::initializer_list<T> ilist);
 
+
+    template <class... Args>
+    iterator emplace(const_iterator pos, Args&&... args);
+
+
     iterator erase(const_iterator pos);
     iterator erase(const_iterator first, const_iterator last);
 
-    void     resize(size_type count);
-    void     resize(size_type count, const value_type& value);
-    void     swap(vector& other) noexcept(std::allocator_traits<Allocator>::
+
+    void push_back(const T& value);
+    void push_back(T&& value);
+
+
+    template <class... Args>
+    reference emplace_back(Args&& ...args);
+
+
+    void pop_back();
+
+
+    void resize(size_type count);
+    void resize(size_type count, const value_type& value);
+
+
+    void swap(vector& other) noexcept(std::allocator_traits<Allocator>::
                                           propagate_on_container_swap::value
                                           || std::allocator_traits<Allocator>::
                                           is_always_equal::value);
-    void     clear() noexcept;
-    ///sort
 
+    
     friend bool operator==(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
-    friend bool operator<(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
     friend bool operator!=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
-    friend bool operator> (const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
-    friend bool operator>=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+
+    friend bool operator<(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
     friend bool operator<=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+
+    friend bool operator>(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
+    friend bool operator>=(const vector<T, Allocator>& lhs, const vector<T, Allocator>& rhs);
 
 private:
     static constexpr double CAPACITY_INCREASE_FACTOR = 2;

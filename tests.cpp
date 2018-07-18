@@ -14,7 +14,7 @@ bool is_same(const T& a, const U& s)
 TEST_CASE("Sort")
 {
     std::vector<std::string> std_vector = {"prive", "poka", "kak dela", "mmmm"};
-    my::vector<std::string> atl_vector = {"prive", "poka", "kak dela", "mmmm"};
+    my::vector<std::string> atl_vector = {"prive", "poa", "kak dela", "mmmm"};
     std::sort(std_vector.begin(), std_vector.end());
     std::sort(atl_vector.begin(), atl_vector.end());
     REQUIRE(is_same(atl_vector, std_vector));
