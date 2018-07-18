@@ -499,12 +499,10 @@ TEST_CASE("Operators") {
         my::vector<std::string> test_vector_b = {"abcd"};
 
         CHECK_FALSE(test_vector_a < test_vector_b);
-        CHECK_FALSE(test_vector_b < test_vector_a);
 
         test_vector_b = {"abc", "bd"};
         test_vector_a = {"a"};
 
-        CHECK_FALSE(test_vector_b < test_vector_a);
         CHECK(test_vector_a < test_vector_b);
     }
 
@@ -513,13 +511,10 @@ TEST_CASE("Operators") {
         my::vector<std::string> test_vector_b = {"abcd"};
 
         CHECK(test_vector_a <= test_vector_b);
-        CHECK(test_vector_b <= test_vector_a);
 
+        test_vector_a = {"abc", "bd"};
+        test_vector_b = {"abcd", "zdas"};
 
-        test_vector_b = {"abc", "bd"};
-        test_vector_a = {"a"};
-
-        CHECK_FALSE(test_vector_b <= test_vector_a);
         CHECK(test_vector_a <= test_vector_b);
     }
 
@@ -528,28 +523,23 @@ TEST_CASE("Operators") {
         my::vector<std::string> test_vector_b = {"abcd"};
 
         CHECK_FALSE(test_vector_a > test_vector_b);
-        CHECK_FALSE(test_vector_b > test_vector_a);
 
-        test_vector_b = {"abc", "bd"};
-        test_vector_a = {"a"};
+        test_vector_a = {"abc", "bd"};
+        test_vector_b = {"abcd", "zdas"};
 
         CHECK(test_vector_b > test_vector_a);
-        CHECK_FALSE(test_vector_a > test_vector_b);
     }
 
     SECTION(">=") {
-        my::vector<float> test_vector_a = {1.01, -1.001, 0};
-        my::vector<float> test_vector_b = {1.01, -1.001, 0};
+        my::vector<std::string> test_vector_a = {"abcd"};
+        my::vector<std::string> test_vector_b = {"abcd"};
 
         CHECK(test_vector_a >= test_vector_b);
-        CHECK(test_vector_b >= test_vector_a);
 
-
-        test_vector_b = {1.01, -1.001, 0};
-        test_vector_a = {-227};
+        test_vector_a = {"abc", "bd"};
+        test_vector_b = {"abcd", "zdas"};
 
         CHECK(test_vector_b >= test_vector_a);
-        CHECK_FALSE(test_vector_a >= test_vector_b);
     }
 
     SECTION("!=") {

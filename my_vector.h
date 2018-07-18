@@ -417,7 +417,7 @@ void vector<T, Allocator>::resize(typename vector<T, Allocator>::size_type count
         return;
     }
     if (count < size_) {
-        erase(begin() + (size_ - count), end());
+        erase(begin() + count, end());
         return;
     }
     allocate_more_if_needed(count - size_);
@@ -434,7 +434,7 @@ void vector<T, Allocator>::resize(typename vector<T, Allocator>::size_type count
         return;
     }
     if (count < size_) {
-        erase(begin() + (size_ - count), end());
+        erase(begin() + count, end());
         return;
     }
     allocate_more_if_needed(count - size_);

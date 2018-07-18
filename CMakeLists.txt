@@ -3,4 +3,4 @@ project(vector)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(vector catch.cpp catch.h tests.cpp my_vector.h)
+add_executable(vector catch.cpp tests.cpp my_vector.h)
