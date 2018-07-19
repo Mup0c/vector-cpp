@@ -32,6 +32,25 @@ private:
     char p_;
 };
 
+class NonCopyableClass {
+public:
+    NonCopyableClass(char c, int i, std::string s) : c_(c), i_(i), s_(s) {}
+
+    NonCopyableClass() : c_('c'), i_(1337), s_("stds") {}
+
+    NonCopyableClass(const NonCopyableClass& other) = delete;
+    NonCopyableClass(NonCopyableClass&& other) = default;
+
+    char c() { return c_; }
+    int i() { return i_; }
+    std::string s() { return s_; }
+
+private:
+    char c_;
+    int i_;
+    std::string s_;
+};
+
 
 class NotIntegralType {
 public:
@@ -185,7 +204,7 @@ TEST_CASE("Modify") {
         my::vector<int> test_vector(10, 8);
         std::vector<int> std_vector = {8, 9, 10, 11, 12, 78099090, -288};
         test_vector.assign(std_vector.begin(), std_vector.end());
-        CHECK(is_same(test_vector, std_vector));
+        CHECK(is_same(tfest_vector, std_vector));
 
     }
 
@@ -271,6 +290,23 @@ TEST_CASE("Modify") {
         CHECK(test_vector[1].getP() == 'b');
         CHECK(test_vector[2].getP() == 'c');
         CHECK(test_vector[3].getP() == 'p');
+    }
+
+    SECTION("emplace_back non copyable") {
+        my::vector<NonCopyableClass> myvec;
+        std::vector<NonCopyableClass> stdvec;
+        NonCopyableClass smclss;
+        CHECK(smclss.s()[2] == 'd');
+        myvec.emplace_back('a', 228, "first");
+        myvec.emplace_back('b', 229, "second");
+        myvec.emplace_back('d', 2210, "third");
+        myvec.emplace_back(NonCopyableClass());
+
+        CHECK(myvec[0].c() == 'a');
+        CHECK(myvec[1].c() == 'b');
+        CHECK(myvec[2].c() == 'd');
+        CHECK(myvec[3].c() == 'c');
+        CHECK_FALSE(smclss.s()[2] == 'd');
     }
 
     SECTION("pop_back") {

@@ -456,7 +456,7 @@ void vector<T, Allocator>::reserve(vector<T, Allocator>::size_type new_cap)
     pointer new_data = allocator_.allocate(new_cap);
     for (size_type i = 0; i < size_; i++) {
         try {
-            std::allocator_traits<Allocator>::construct(allocator_, new_data + i, std::forward<const T&>(data_[i]));
+            std::allocator_traits<Allocator>::construct(allocator_, new_data + i, std::forward<T>(data_[i]));
         } catch ( ... ) {
             for (size_type j = 0; j < i; j++){
                 std::allocator_traits<Allocator>::destroy(allocator_, new_data + j);
